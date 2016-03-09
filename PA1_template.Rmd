@@ -1,27 +1,28 @@
 ---
 title: 'Reproducible Research: Peer Assessment 1'
 output:
-  html_document:
-  keep_md: yes
-  pdf_document: default
-  word_document: default
+  md_document
 ---
+```{r}
 library(dplyr)
 library(lubridate)
 library(ggplot2)
-
+```
 ## Loading and preprocessing the data
 ####1. Load the data (i.e. read.csv()) and
+```{r}
 data <- read.csv("activity.csv", 
                   header = TRUE, 
                   sep = ',', 
                   colClasses = c("numeric", "character", "integer"))
-                  
+```                  
 ####2. Process/transform the data (if necessary) into a format suitable for your analysis
+
+```{r}
 data$date <- ymd(data$date)
-
+```
 ## What is mean total number of steps taken per day?
-
+```{r}
 steps <- data %>%
   filter(!is.na(steps)) %>%
   group_by(date) %>%
@@ -31,9 +32,9 @@ steps <- data %>%
 ggplot(steps, aes(x = steps)) +
   geom_histogram(fill = "red", binwidth = 1000) +
   labs(title = "Histogram of Steps per day", x = "Steps per day", y = "Frequency")
-  
+```  
 ## What is the average daily activity pattern?
-
+```{r}
 mean_steps <- mean(steps$steps, na.rm = TRUE)
 mean_steps
 
@@ -49,7 +50,10 @@ interval <- data %>%
   geom_line(color = "red")
 
 interval[which.max(interval$steps),]
+```
+
 ## Imputing missing values
+```{r}
 sum(is.na(data$steps))
 data_full <- data
 nas <- is.na(data_full$steps)
@@ -73,9 +77,10 @@ median_steps_full <- median(steps_full$steps, na.rm = TRUE)
 mean_steps_full
 
 median_steps_full
-  
-## Are there differences in activity patterns between weekdays and weekends?
+```
 
+## Are there differences in activity patterns between weekdays and weekends?
+```{r}
 data_full <- mutate(data_full, weektype = ifelse(weekdays(data_full$date) == "Saturday" | weekdays(data_full$date) == "Sunday", "weekend", "weekday"))
 data_full$weektype <- as.factor(data_full$weektype)
 head(data_full)
@@ -89,3 +94,4 @@ s <- ggplot(interval_full, aes(x=interval, y=steps, color = weektype)) +
   facet_wrap(~weektype, ncol = 1, nrow=2)
 print(s)
 
+```
